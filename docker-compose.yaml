@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  postgresql:
+    image: postgres:latest
+    container_name: postgresql
+    restart: always
+    environment:
+      POSTGRES_USER: ${SENDMIND_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${SENDMIND_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${SENDMIND_POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  netdata:
+    image: netdata/netdata
+    container_name: netdata
+    hostname: netdata
+    ports:
+      - "19999:19999"
+    restart: always
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - netdata_config:/etc/netdata
+      - netdata_lib:/var/lib/netdata
+      - netdata_cache:/var/cache/netdata
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+
+volumes:
+  portainer_data:
+  postgres_data:
+  netdata_config:
+  netdata_lib:
+  netdata_cache:
