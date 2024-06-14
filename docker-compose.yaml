@@ -1,6 +1,11 @@
 version: '3'
 
 services:
+  web:
+    image: hello-world:latest
+    ports:
+      - "8080:8080"
+
   portainer:
     image: portainer/portainer-ce
     container_name: portainer

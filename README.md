@@ -74,3 +74,9 @@ sudo docker run -d \
 postgres
 ```
 
+## Build
+
+### go server
+```
+ docker build -t hello-world:latest .
+```
