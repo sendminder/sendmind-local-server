@@ -1,11 +1,17 @@
-version: '3'
+version: '3.8'
 
 services:
   web:
     image: hello-world:latest
     ports:
       - "8080:8080"
-
+	
+  simple-chat:
+    image: seninder/simple-chat:latest
+    ports:
+     - "8088:8088"
+    restart: always
+	
   portainer:
     image: portainer/portainer-ce
     container_name: portainer
