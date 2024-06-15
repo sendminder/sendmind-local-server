@@ -5,14 +5,14 @@ services:
     image: hello-world:latest
     ports:
       - "8080:8080"
-	
+
   simple-chat:
     image: seninder/simple-chat:latest
     platform: linux/amd64
     ports:
      - "8088:8088"
     restart: always
-	
+
   portainer:
     image: portainer/portainer-ce
     container_name: portainer
