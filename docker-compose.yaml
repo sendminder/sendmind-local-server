@@ -7,6 +7,10 @@ services:
     ports:
      - "8080:8080"
     restart: always
+    environment:
+      SENDMIND_POSTGRES_USER: ${SENDMIND_POSTGRES_USER}
+      SENDMIND_POSTGRES_PASSWORD: ${SENDMIND_POSTGRES_PASSWORD}
+      SENDMIND_POSTGRES_DB: ${SENDMIND_POSTGRES_DB}
 
   portainer:
     image: portainer/portainer-ce
@@ -24,7 +28,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: ${SENDMIND_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${SENDMIND_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${SENDMIND_POSTGRES_PASSWORD}
       POSTGRES_DB: ${SENDMIND_POSTGRES_DB}
     ports:
       - "5432:5432"
