@@ -3,6 +3,8 @@ version: '3.8'
 services:
   sendmind-hub:
     image: seninder/sendmind-hub:latest
+    depends_on:
+      - postgresql
     platform: linux/amd64
     ports:
      - "8080:8080"
