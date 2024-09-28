@@ -73,10 +73,3 @@ sudo docker run -d \
 -v /data/postgres/data:/var/lib/postgresql/data \
 postgres
 ```
-
-## Build
-
-### go server
-```
- docker build -t hello-world:latest .
-```

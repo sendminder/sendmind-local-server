@@ -1,16 +1,11 @@
 version: '3.8'
 
 services:
-  web:
-    image: hello-world:latest
-    ports:
-      - "8080:8080"
-
-  simple-chat:
-    image: seninder/simple-chat:latest
+  sendmind-hub:
+    image: seninder/sendmind-hub:latest
     platform: linux/amd64
     ports:
-     - "8088:8088"
+     - "8080:8080"
     restart: always
 
   portainer:
