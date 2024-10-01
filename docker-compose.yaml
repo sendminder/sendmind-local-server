@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   sendmind-hub:
     image: seninder/sendmind-hub:latest
