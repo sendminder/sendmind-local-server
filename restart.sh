@@ -1,2 +1,2 @@
-docker compose -f ./docker-compose.yaml down
-docker compose -f ./docker-compose.yaml up -d
+sudo docker compose -f ./docker-compose.yaml down
+sudo docker compose -f ./docker-compose.yaml up -d
