@@ -73,3 +73,7 @@ sudo docker run -d \
 -v /data/postgres/data:/var/lib/postgresql/data \
 postgres
 ```
+
+## 설정 추가
+.envrc 에 export 추가
+docker file 에서 해당 키 넘기기
