@@ -27,6 +27,30 @@ services:
     volumes:
           - ${SENDMIND_GOOGLE_KEY_PATH}:${SENDMIND_DOCKER_GOOGLE_KEY_PATH}
           - ${SENDMIND_FIREBASE_KEY_PATH}:${SENDMIND_DOCKER_FIREBASE_KEY_PATH}
+  
+  glitchtip:
+    image: glitchtip/glitchtip:latest
+    container_name: glitchtip
+    restart: always
+    depends_on:
+      - postgresql
+      - redis
+    networks:
+      - app-network
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://${SENDMIND_POSTGRES_USER}:${SENDMIND_POSTGRES_PASSWORD}@postgresql:5432/glitchtip
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${GLITCHTIP_SECRET_KEY}
+      - PORT=8000
+      - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+      - EMAIL_URL=${GLITCHTIP_EMAIL_URL:-smtp://user:password@smtp.example.com:587}
+      - DEFAULT_FROM_EMAIL=${GLITCHTIP_FROM_EMAIL:-sendminder@gmail.com}
+      - GLITCHTIP_DOMAIN=${GLITCHTIP_DOMAIN:-localhost:8000}
+    volumes:
+      - glitchtip_data:/code/uploads
+
   portainer:
     image: portainer/portainer-ce
     container_name: portainer
@@ -112,6 +136,7 @@ volumes:
   netdata_lib:
   netdata_cache:
   redis_data:
+  glitchtip_data:
   # pgadmin_data:
 
 networks:
