@@ -40,14 +40,14 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgres://${SENDMIND_POSTGRES_USER}:${SENDMIND_POSTGRES_PASSWORD}@postgresql:5432/glitchtip
+      - DATABASE_URL=postgres://${SENDMIND_POSTGRES_USER}:${SENDMIND_POSTGRES_PASSWORD}@postgresql:5432/${SENDMIND_POSTGRES_DB}
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=${GLITCHTIP_SECRET_KEY}
       - PORT=8000
       - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
       - EMAIL_URL=${GLITCHTIP_EMAIL_URL:-smtp://user:password@smtp.example.com:587}
-      - DEFAULT_FROM_EMAIL=${GLITCHTIP_FROM_EMAIL:-sendminder@gmail.com}
-      - GLITCHTIP_DOMAIN=${GLITCHTIP_DOMAIN:-localhost:8000}
+      - DEFAULT_FROM_EMAIL=${GLITCHTIP_FROM_EMAIL}
+      - GLITCHTIP_DOMAIN=${GLITCHTIP_DOMAIN:-http://localhost:8000}
     volumes:
       - glitchtip_data:/code/uploads
 
