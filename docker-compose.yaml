@@ -65,6 +65,7 @@ services:
       - apparmor=unconfined
     environment:
       - NETDATA_ENABLE_PROMETHEUS=yes
+      - NETDATA_ENABLE_GO=yes
     volumes:
       - netdata_config:/etc/netdata
       - netdata_lib:/var/lib/netdata
