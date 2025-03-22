@@ -76,8 +76,8 @@ services:
       - /sys:/host/sys:ro
       - /etc/os-release:/host/os-release:ro
       - ./netdata/netdata.conf:/etc/netdata/netdata.conf
-      # - ./netdata/prometheus.conf:/etc/netdata/go.d/prometheus.conf
       - ./netdata/go.d.conf:/etc/netdata/go.d.conf
+      # - ./netdata/prometheus.conf:/etc/netdata/go.d/prometheus.conf
 
   # pgadmin:
   #   image: dpage/pgadmin4
