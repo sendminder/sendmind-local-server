@@ -1,0 +1,7 @@
+jobs:
+  - name: sendmind-hub
+    url: http://sendmind-hub:8080/metrics # localhost가 아닌 서비스 이름 사용
+    collect_response_time: yes
+    metrics_filter: # 수집할 메트릭 필터링 (선택사항)
+      includes:
+        - sendmind_hub_* # sendmind_hub_ 로 시작하는 모든 메트릭 수집

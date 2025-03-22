@@ -6,6 +6,8 @@ services:
     platform: linux/amd64
     ports:
      - "8080:8080"
+    networks:
+      - app-network
     restart: always
     environment:
       SENDMIND_POSTGRES_ADDR: ${SENDMIND_POSTGRES_ADDR}
@@ -37,6 +39,8 @@ services:
     image: postgres:latest
     container_name: postgresql
     restart: always
+    networks:
+      - app-network
     environment:
       POSTGRES_USER: ${SENDMIND_POSTGRES_USER}
       POSTGRES_PASSWORD: ${SENDMIND_POSTGRES_PASSWORD}
@@ -46,22 +50,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${SENDMIND_PG_ADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${SENDMIND_PG_ADMIN_PW}
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-
   netdata:
     image: netdata/netdata
     container_name: netdata
     hostname: netdata
+    networks:
+      - app-network
     ports:
       - "19999:19999"
     restart: always
@@ -69,6 +63,8 @@ services:
       - SYS_PTRACE
     security_opt:
       - apparmor=unconfined
+    environment:
+      - NETDATA_ENABLE_PROMETHEUS=yes
     volumes:
       - netdata_config:/etc/netdata
       - netdata_lib:/var/lib/netdata
@@ -77,12 +73,29 @@ services:
       - /etc/group:/host/etc/group:ro
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
-      - /etc/os-release:/host/etc/os-release:ro
+      - /etc/os-release:/host/os-release:ro
+      - ./netdata/prometheus.yml:/etc/netdata/go.d/prometheus.yml
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pgadmin
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${SENDMIND_PG_ADMIN_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${SENDMIND_PG_ADMIN_PW}
+  #   ports:
+  #     - "5050:80"
+  #   volumes:
+  #     - pgadmin_data:/var/lib/pgadmin
 
 volumes:
   portainer_data:
   postgres_data:
-  pgadmin_data:
   netdata_config:
   netdata_lib:
   netdata_cache:
+  # pgadmin_data:
+
+networks:
+  app-network:
+    driver: bridge
