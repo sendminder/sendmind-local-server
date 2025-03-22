@@ -1,4 +1,4 @@
 jobs:
   - name: sendmind-hub
-    url: http://sendmind-hub:8080/metrics # localhost가 아닌 서비스 이름 사용
+    url: http://sendmind-hub:8080/metrics
     collect_response_time: yes
