@@ -31,7 +31,7 @@ services:
           - ${SENDMIND_FIREBASE_KEY_PATH}:${SENDMIND_DOCKER_FIREBASE_KEY_PATH}
 
   x-environment: &default-environment
-    DATABASE_URL: postgres://${SENDMIND_POSTGRES_USER}:${SENDMIND_POSTGRES_PASSWORD}@postgres:5432/glitchtip}
+    DATABASE_URL: postgres://${SENDMIND_POSTGRES_USER}:${SENDMIND_POSTGRES_PASSWORD}@postgres:5432/glitchtip
     SECRET_KEY: ${SENDMIND_SECRET_KEY}
     PORT: 8000
     EMAIL_URL: ${GLITCHTIP_EMAIL_URL:-consolemail://}
