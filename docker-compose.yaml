@@ -2,7 +2,7 @@ services:
   sendmind-hub:
     image: seninder/sendmind-hub:latest
     depends_on:
-      - postgresql
+      - postgres
       - redis
     platform: linux/amd64
     ports:
@@ -29,31 +29,77 @@ services:
     volumes:
           - ${SENDMIND_GOOGLE_KEY_PATH}:${SENDMIND_DOCKER_GOOGLE_KEY_PATH}
           - ${SENDMIND_FIREBASE_KEY_PATH}:${SENDMIND_DOCKER_FIREBASE_KEY_PATH}
-  
-  glitchtip:
-    image: glitchtip/glitchtip:latest
-    container_name: glitchtip
-    restart: always
-    depends_on:
-      - postgresql
-      - redis
+
+  x-environment: &default-environment
+    DATABASE_URL: postgres://${SENDMIND_POSTGRES_USER}:${SENDMIND_POSTGRES_PASSWORD}@postgres:5432/glitchtip}
+    SECRET_KEY: ${SENDMIND_SECRET_KEY}
+    PORT: 8000
+    EMAIL_URL: ${GLITCHTIP_EMAIL_URL:-consolemail://}
+    GLITCHTIP_DOMAIN: ${GLITCHTIP_DOMAIN:-http://localhost:8000}
+    DEFAULT_FROM_EMAIL: ${GLITCHTIP_FROM_EMAIL:-sendminder@gmail.com}
+    CELERY_WORKER_AUTOSCALE: "1,3"
+
+  x-depends_on: &default-depends_on
+    - postgres
+    - redis
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: unless-stopped
+    networks:
+      - app-network
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+      POSTGRES_USER: ${SENDMIND_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${SENDMIND_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${SENDMIND_POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    networks:
+      - app-network
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  web:
+    image: glitchtip/glitchtip
+    depends_on: *default-depends_on
     networks:
       - app-network
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=postgres://${SENDMIND_POSTGRES_USER}:${SENDMIND_POSTGRES_PASSWORD}@postgresql:5432/glitchtip
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=${GLITCHTIP_SECRET_KEY}
-      - PORT=8000
-      - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
-      - EMAIL_URL=${GLITCHTIP_EMAIL_URL:-smtp://user:password@smtp.example.com:587}
-      - DEFAULT_FROM_EMAIL=${GLITCHTIP_FROM_EMAIL}
-      - GLITCHTIP_DOMAIN=${GLITCHTIP_DOMAIN:-http://localhost:8000}
-      - DJANGO_SETTINGS_MODULE=glitchtip.settings
-      - RUN_MIGRATIONS=true
+    environment: *default-environment
+    restart: unless-stopped
     volumes:
-      - glitchtip_data:/code/uploads
+      - uploads:/code/uploads
+
+  worker:
+    image: glitchtip/glitchtip
+    command: ./bin/run-celery-with-beat.sh
+    depends_on: *default-depends_on
+    networks:
+      - app-network
+    environment: *default-environment
+    restart: unless-stopped
+    volumes:
+      - uploads:/code/uploads
+
+  migrate:
+    image: glitchtip/glitchtip
+    depends_on: *default-depends_on
+    networks:
+      - app-network
+    command: ./bin/run-migrate.sh
+    environment: *default-environment
 
   portainer:
     image: portainer/portainer-ce
@@ -64,21 +110,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
-
-  postgresql:
-    image: postgres:latest
-    container_name: postgresql
-    restart: always
-    networks:
-      - app-network
-    environment:
-      POSTGRES_USER: ${SENDMIND_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${SENDMIND_POSTGRES_PASSWORD}
-      POSTGRES_DB: ${SENDMIND_POSTGRES_DB}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
   netdata:
     image: netdata/netdata
@@ -107,41 +138,15 @@ services:
       - /etc/os-release:/host/os-release:ro
       - ./netdata/netdata.conf:/etc/netdata/netdata.conf
       - ./netdata/go.d.conf:/etc/netdata/go.d.conf
-      # - ./netdata/prometheus.conf:/etc/netdata/go.d/prometheus.conf
-
-  redis:
-    image: redis:latest
-    container_name: redis
-    restart: always
-    networks:
-      - app-network
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    command: redis-server --save 60 1 --loglevel warning
-
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   container_name: pgadmin
-  #   restart: always
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: ${SENDMIND_PG_ADMIN_EMAIL}
-  #     PGADMIN_DEFAULT_PASSWORD: ${SENDMIND_PG_ADMIN_PW}
-  #   ports:
-  #     - "5050:80"
-  #   volumes:
-  #     - pgadmin_data:/var/lib/pgadmin
 
 volumes:
   portainer_data:
-  postgres_data:
+  pg-data:
   netdata_config:
   netdata_lib:
   netdata_cache:
   redis_data:
-  glitchtip_data:
-  # pgadmin_data:
+  uploads:
 
 networks:
   app-network:
