@@ -1,5 +1,5 @@
 sudo docker compose -f ./docker-compose.yaml down
-sudo docker compose -f ./docker-compose.yaml up -d
+sudo docker compose -f ./docker-compose.yaml up -d  --remove-orphans
 
 sudo docker exec -it netdata sh -c 'cat > /etc/netdata/go.d/prometheus.conf << EOF
 jobs:
